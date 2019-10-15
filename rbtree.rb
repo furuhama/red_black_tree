@@ -36,6 +36,15 @@ class Node
     self.id == node.id
   end
 
+  def dump
+    {
+      id: id,
+      key: key,
+      value: value,
+      color: color == BLACK ? 'black' : 'red'
+    }
+  end
+
   private
 
   def brother
@@ -54,6 +63,33 @@ class Tree
 
   def initialize(key, value)
     @root = Node.new(key, value, BLACK)
+  end
+
+  def dump
+    depth = 1
+    node = root
+
+    while node.left
+      depth += 1
+      node = node.left
+    end
+
+    depth_arr = Array.new(depth) { [] }
+
+    depth_arr.each.with_index(1) do |arr, idx|
+      if idx == 1
+        arr << root
+      else
+        depth_arr[idx - 2].each do |node|
+          arr << node.left if node.left
+          arr << node.right if node.right
+        end
+      end
+    end
+
+    depth_arr.each do |arr|
+      arr.map!(&:dump).join(', ')
+    end.join("\n")
   end
 
   def insert(key, value)
