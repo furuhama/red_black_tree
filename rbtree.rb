@@ -2,11 +2,25 @@
 
 BLACK = 0
 RED = 1
+M = Mutex.new
+
+class ID
+  @@identification_number = 0
+
+  class << self
+    def generate
+      M.synchronize do
+        @@identification_number += 1
+      end
+    end
+  end
+end
 
 class Node
-  attr_accessor :color, :left, :right, :parent, :key, :value
+  attr_accessor :color, :left, :right, :parent, :key, :value, :id
 
   def initialize(key, value, color)
+    @id = ID.generate
     @key = key
     @value = value
     @color = color
@@ -14,6 +28,12 @@ class Node
 
   def uncle
     parent&.brother
+  end
+
+  def ==(node)
+    return false unless node
+
+    self.id == node.id
   end
 
   private
