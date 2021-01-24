@@ -115,6 +115,48 @@ class Tree
     root.color = BLACK
   end
 
+  def delete(key)
+    node = root
+    while node != nil && node.key != key
+      node = node.key > key ? node.left : node.right
+    end
+
+    return if node.nil?
+
+    parent = node.parent
+    child = nil
+
+    if node.left && node.right
+      succ = find_successor(node)
+      node.key = succ.key
+
+      parent = succ.parent
+      node = succ
+      child = succ.right unless succ.right.nil?
+    elsif node.left.nil? && node.right
+      child = node.right
+    elsif node.left && node.right.nil?
+      child = node.left
+    end
+
+    if parent
+      if parent.left == node
+        parent.left = child
+      else
+        parent.right = child
+      end
+
+      child.parent = parent if child
+    else
+      @root = child
+      @root.parent = nil if root
+    end
+
+    if node.color == BLACK
+      deletion_fixup(child, parent)
+    end
+  end
+
   private
 
   def insertion_fixup(node)
